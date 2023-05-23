@@ -1,0 +1,3 @@
+START TRANSACTION;
+DELETE FROM histories where id = 10;
+ROLLBACK;

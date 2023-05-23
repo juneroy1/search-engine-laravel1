@@ -1,0 +1,1 @@
+SELECT COUNT(creator_id), creator_id FROM users GROUP BY creator_id;
