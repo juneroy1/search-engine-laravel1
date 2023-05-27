@@ -13,6 +13,7 @@ use App\Http\Controllers\ProgrammingController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\SampleController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -23,6 +24,16 @@ use App\Http\Controllers\TeacherController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/sample-create-form', function(){
+    // return 'testing for testing';
+    // return view('')
+    // animal/edit.php
+    return view('sample');
+});
+
+Route::post('/submit-sample',[SampleController::class, 'submitSampleForm']);
+
+
 // for landing page url ---- first land - search page
 Route::get('/', [PageController::class, 'welcome']);
 
