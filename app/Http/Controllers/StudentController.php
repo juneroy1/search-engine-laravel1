@@ -46,32 +46,47 @@ class StudentController extends Controller
     public function store(Request $request)
     {
         //
-            DB::beginTransaction();
+        DB::beginTransaction();
           try {
             $data = $request->except('_token');
-        
+
                 $id = null;
                 if (Auth::id()) {
                 $id = Auth::id();
                 }
-                //  dd($id)   ;
-                $student = User::create(
-                    [
-                        'first_name' => $data['first_name'],
-                        'last_name' => $data['last_name'],
-                        'middle_name' => $data['middle_name'],
-                        'address' => $data['address'],
-                        'description' => $data['description'],
-                        'type' => 'student',
-                        'position' => 'student',
-                        'birthdate' => $data['birthdate'],
-                        'email' => $data['email'],
-                        'password' => '',
-                        'creator_id' => $id,
-                    ]
-                );
 
-                if ($student) {
+                $first_name = $data['first_name'];
+                $last_name = $data['last_name'];
+                $middle_name = $data['middle_name'];
+                $address = $data['address'];
+                $description = $data['description'];
+                $type = 'student';
+                $position = 'student';
+                $birthdate = $data['birthdate'];
+                $email = $data['email'];
+                $category = 'user';
+                $creator_id = $id;
+                $number_of_times_update = 1;
+                $password = '';
+
+                //  dd($id)   ;
+                $insert = \DB::statement(
+                    "CALL insert_user_student(?,?,?,?,?,?,?,?,?,?,?,?)",[
+                            $first_name,
+                            $last_name,
+                            $middle_name,
+                            $address,
+                            $description,
+                            $type,
+                            $position,
+                            $birthdate,
+                            $email,
+                            $category,
+                            $creator_id,
+                            $number_of_times_update,
+                        ]
+                    );
+                if ($insert) {
                     # code...
                     DB::commit();
                     return back()->with('success','Item created successfully!');
@@ -84,10 +99,10 @@ class StudentController extends Controller
                 return back()->with('error','Creating student failed to create!');
 
             }
-        
 
-           
-        
+
+
+
     }
 
     /**
@@ -100,11 +115,10 @@ class StudentController extends Controller
     {
         //
         $student =User::find($id);
-
         return view('view',[
             'result' => $student
-        ]); 
-       
+        ]);
+
     }
 
     /**
@@ -113,11 +127,11 @@ class StudentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         //
          $student = User::find($id);
-        
+
         return view('students.edit', [
             'student' => $student
         ]);
@@ -132,23 +146,56 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
-        // dd('put');
-        $student = User::find($id);
-        $student->first_name = $request->first_name;
-        $student->last_name = $request->last_name;
-        $student->middle_name = $request->middle_name;
-        $student->address = $request->address;
-        $student->birthdate = $request->birthdate;
-        $student->email = $request->email;
-        $student->description = $request->description;
-        $student->save();
+        
+        $data = $request->except('_token');
 
-         if ($student) {
-            # code...
+                $creator_id = null;
+                if (Auth::id()) {
+                $creator_id = Auth::id();
+                }
+                $first_name = $data['first_name'];
+                $last_name = $data['last_name'];
+                $middle_name = $data['middle_name'];
+                $address = $data['address'];
+                $description = $data['description'];
+                $type = 'student';
+                $position = 'student';
+                $birthdate = $data['birthdate'];
+                $category = 'user';
+                $creator_id = $creator_id;
+                $email = $data['email'];
+
+                //  dd($id)   ;
+                $update = \DB::statement(
+                    "CALL update_user_student(?,?,?,?,?,?,?,?,?,?,?,?)",[
+                            $id,
+                            $first_name,
+                            $last_name,
+                            $middle_name,
+                            $address,
+                            $description,
+                            $type,
+                            $position,
+                            $birthdate,
+                            $category,
+                            $creator_id,
+                            $email
+                        ]
+                    );
+
+                
+
+         if ($update) {
+            // update the number_of_times_update column here
+            $finduser = User::find($id);
+            \DB::statement('CALL incrementNumberOfUpdates(?, @result)', [$finduser->number_of_times_update]);
+            $result = \DB::select('SELECT @result AS result')[0]->result;
+
+            $finduser->number_of_times_update = $result;
+            $finduser->save();
+
             return redirect('/student')->with('success','Item updated successfully!');
         }
-
             return back()->with('error','Updating student failed to create!');
     }
 
@@ -162,9 +209,8 @@ class StudentController extends Controller
     {
         //
         // dd('delete');
-        $student = User::find($id);
-        $student->delete();
-        if ($student) {
+        $delete = \DB::statement('CALL delete_user_student(?)', [$id]);
+        if ($delete) {
             # code...
             return redirect('/student')->with('success','Item deleted successfully!');
         }
