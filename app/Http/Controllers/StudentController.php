@@ -208,7 +208,16 @@ class StudentController extends Controller
     public function destroy($id)
     {
         //
-        // dd('delete');
+        // before we update the data we need to update first so that we can get the id of the user who deleted the data.
+        $who_deleted_id = null;
+        if (Auth::id()) {
+            $who_deleted_id = Auth::id();
+        }
+
+        $update = User::find($id);
+        $update->who_delete_id = $who_deleted_id;
+        $update->save();
+
         $delete = \DB::statement('CALL delete_user_student(?)', [$id]);
         if ($delete) {
             # code...
