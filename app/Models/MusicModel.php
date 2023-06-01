@@ -12,6 +12,5 @@ class MusicModel extends Model
         'name',
         'details',
     ];
-
     protected $table = 'musics';
 }
