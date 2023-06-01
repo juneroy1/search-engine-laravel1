@@ -22,8 +22,10 @@ class StudentController extends Controller
      */
     public function index()
     {
+        // DD('DADADA');
         //
-        $students = ViewStudentsModel::all();
+        $students = User::where('type','=','student')->orderBy('last_name', 'DESC')->get();
+        
         return view('students.index', ['students' => $students]);
     }
 
